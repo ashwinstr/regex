@@ -3,7 +3,6 @@
 import asyncio
 
 from pyrogram import Client
-from jutsu.config import Config
 
 
 async def _init() -> None:
