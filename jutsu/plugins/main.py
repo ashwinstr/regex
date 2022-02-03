@@ -64,7 +64,7 @@ async def separate_sed(sed_string):
 
 
 @Client.on_message(
-    filters.regex(pattern="^[a]\/.*\/.*"), group=-1
+    filters.regex(pattern=r"^a\/.*\/.*"), group=-1
 )
 async def sed(bot, message):
     """For sed command, use sed on Telegram."""
@@ -104,7 +104,8 @@ async def sed(bot, message):
                 if not last:
                     last_msg = textx
                     last = True
-            except:
+            except Exception as e:
+                print(e)
                 continue
             if textx.text:
                 msg_text = textx.text
@@ -155,13 +156,18 @@ async def sed(bot, message):
            
 
 @Client.on_message(
-    filters.regex(pattern="^[r]\/.*"), group=-2
+    filters.regex(pattern=r"^r\/.*"), group=-2
 )
 async def no_reply_sed(bot, message):
     try:
         await bot.delete_messages(message.chat.id, message.message_id)
-    except:
+    except MessageDeleteForbidden:
         pass
+    reply_ = message.reply_to_message
+    if reply_:
+        reply_to = reply_.message_id
+    else:
+        reply_to = None
     text_ = message.text
     input_ = text_.split("/", 1)[1]
-    await bot.send_message(message.chat.id, input_, disable_web_page_preview=True)
+    await bot.send_message(message.chat.id, input_, reply_to_message_id=reply_to, disable_web_page_preview=True)
