@@ -162,6 +162,11 @@ async def no_reply_sed(bot, message):
         await bot.delete_messages(message.chat.id, message.message_id)
     except:
         pass
+    reply_ = message.reply_to_message
+    if reply_:
+        reply_to = reply_.message_id
+    else:
+        reply_to = None
     text_ = message.text
     input_ = text_.split("/", 1)[1]
-    await bot.send_message(message.chat.id, input_, disable_web_page_preview=True)
+    await bot.send_message(message.chat.id, input_, reply_to_message_id=reply_to, disable_web_page_preview=True)
