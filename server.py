@@ -15,4 +15,4 @@ api_port = os.environ.get("API_PORT")
 
 if __name__ == "__main__" and api_port:
     print("Starting uvicorn")
-    uvicorn.run(app, worker=1, host="0.0.0.0", api=api_port, log_level="error")
+    uvicorn.run(app, workers=1, host="0.0.0.0", api=api_port, log_level="error")
