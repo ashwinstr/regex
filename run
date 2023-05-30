@@ -1,0 +1,13 @@
+#!/bin/sh
+
+server() {
+    if test "$API_PORT" ; then
+        python3 -m server
+        echo "Started API..."
+    else
+        echo "Skipping API..."
+    fi
+}
+
+server
+python3.10 -m jutsu
