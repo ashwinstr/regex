@@ -4,6 +4,7 @@ import re
 from sre_constants import error as sre_err
 
 from pyrogram import filters
+from pyrogram.enums import ParseMode
 from pyrogram.errors import MessageDeleteForbidden
 
 from jutsu import sedex
@@ -150,7 +151,7 @@ async def main_sedex(_, message):
         except sre_err as e:
             return await sedex.send_message(message.chat.id, f"**ERROR:** {e}")
         if text:
-            await sedex.send_message(message.chat.id, text, reply_to_message_id=reply_to, parse_mode="html")
+            await sedex.send_message(message.chat.id, text, reply_to_message_id=reply_to, parse_mode=ParseMode.HTML)
 
 
 @sedex.on_message(
