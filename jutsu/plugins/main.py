@@ -72,7 +72,7 @@ async def main_sedex(_, message):
     og_text = message.text
     if not str(og_text).endswith(" -n"):
         try:
-            await sedex.delete_messages(message.chat.id, [message.message_id])
+            await message.delete()
         except MessageDeleteForbidden:
             pass
     reply_ = message.reply_to_message
@@ -81,8 +81,7 @@ async def main_sedex(_, message):
         is_reply = False
     else:
         if not reply_.text and not reply_.caption:
-            await sedex.send_message(message.chat.id, "Reply to message with text plox...",
-                                     reply_to_message_id=reply_.message_id)
+            await message.reply("Reply to message with text plox...")
             return
     sed_result = await separate_sed(og_text)
     if sed_result:
@@ -90,17 +89,17 @@ async def main_sedex(_, message):
     else:
         return
     if not repl:
-        return await sedex.send_message(
+        return await message.reply(
             "`Master, I don't have brains. Well you neither I guess.`"
         )
     if is_reply:
-        textx = await sedex.get_messages(message.chat.id, message.reply_to_message.message_id)
-        reply_to = message.reply_to_message.message_id
+        textx = await sedex.get_messages(message.chat.id, message.reply_to_message.id)
+        reply_to = message.reply_to_message.id
     else:
         found = False
         last = False
         for one in range(15):
-            msg_id = (message.message_id - one) - 1
+            msg_id = (message.id - one) - 1
             try:
                 textx = await sedex.get_messages(message.chat.id, msg_id)
                 if not last:
@@ -112,17 +111,17 @@ async def main_sedex(_, message):
             if textx.text:
                 msg_text = textx.text
                 if repl in msg_text:
-                    reply_to = textx.message_id
+                    reply_to = textx.id
                     found = True
                     break
         if not found:
             textx = last_msg
-            reply_to = textx.message_id
+            reply_to = textx.id
     if sed_result:
         if textx:
             to_fix = textx.text
         else:
-            return await sedex.send_message(
+            return await message.reply(
                 "`Master, I don't have brains. Well you neither I guess.`"
             )
         try:
@@ -159,12 +158,12 @@ async def main_sedex(_, message):
 )
 async def reply_sed(_, message):
     try:
-        await sedex.delete_messages(message.chat.id, message.message_id)
+        await sedex.delete_messages(message.chat.id, message.id)
     except MessageDeleteForbidden:
         pass
     reply_ = message.reply_to_message
     if reply_:
-        reply_to = reply_.message_id
+        reply_to = reply_.id
     else:
         reply_to = None
     text_ = message.text
