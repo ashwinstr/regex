@@ -20,6 +20,6 @@ class Sedex(Client):
         super().__init__(**kwargs)
 		
     async def start(self: 'Sedex'):
-	    await super().start()
-	    await self.send_message(Config.LOG_CHANNEL_ID, "`Sedex has been started...`")
+	await super().start()
+	await self.send_message(Config.LOG_CHANNEL_ID, "`Sedex has been started...`")
         await _init()
