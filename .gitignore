@@ -6,3 +6,5 @@ config.env
 # repl
 poetry.lock
 pyproject.toml
+.replit
+replit.*
