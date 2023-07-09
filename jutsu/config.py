@@ -1,0 +1,15 @@
+# config.py
+
+import os
+from dotenv import load_dotenv
+
+if os.path.isfile("config.env"):
+    load_dotenv("config.env")
+
+
+class Config:
+
+    API_HASH = os.environ.get("API_HASH")
+    API_ID = int(os.environ.get("API_ID", 0))
+    BOT_TOKEN = os.environ.get("BOT_TOKEN")
+    LOG_CHANNEL_ID = int(os.environ.get("LOG_CHANNEL_ID", 0))

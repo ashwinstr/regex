@@ -1,8 +1,11 @@
 # git+https://github.com/ashwinstr/pyrogram.git@x21
-emoji
-gitpython
-heroku3
-Pyrogram
+emoji==2.6.0
+gitpython==3.1.31
+Pyrogram~=2.0.106
 python-decouple
-TgCrypto
+TgCrypto==1.2.5
 Unidecode
+
+python-dotenv==1.0.0
+uvicorn~=0.22.0
+fastapi==0.100.0

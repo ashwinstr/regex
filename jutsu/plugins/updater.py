@@ -1,35 +1,42 @@
-import heroku3
-import os
-from os import system
-import asyncio
-import time
+# updater.py
 
-from pyrogram import Client, filters
+import asyncio
+import os
+import time
+from os import system
+
 from git import Repo
 from git.exc import GitCommandError
+from pyrogram import filters
+
+from jutsu import sedex
+
+try:
+    import heroku3
+
+    HEROKU_API_KEY = os.environ.get("HEROKU_API_KEY", None)
+    HEROKU_APP_NAME = os.environ.get("HEROKU_APP_NAME", None)
+    HEROKU_ENV = True
+    HEROKU_APP = (
+            heroku3.from_key(HEROKU_API_KEY).apps()[HEROKU_APP_NAME]
+            if HEROKU_ENV and HEROKU_API_KEY and HEROKU_APP_NAME
+            else None
+        )
+except ImportError:
+    HEROKU_APP = None
 
 
-HEROKU_API_KEY = os.environ.get("HEROKU_API_KEY", None)
-HEROKU_APP_NAME = os.environ.get("HEROKU_APP_NAME", None)
-HEROKU_ENV = True
-HEROKU_APP = (
-        heroku3.from_key(HEROKU_API_KEY).apps()[HEROKU_APP_NAME]
-        if HEROKU_ENV and HEROKU_API_KEY and HEROKU_APP_NAME
-        else None
-    )
-
-
-@Client.on_message(
+@sedex.on_message(
     filters.command(["update"], prefixes=";")
     & filters.user([1013414037]),
     group=4
 )
-async def tester_(bot, message):
+async def updater_(_, message):
     input_ = message.text
     up_repo = "http://github.com/ashwinstr/sedex"
     branch = "main"
     repo = Repo()
-    await bot.send_message(message.chat.id, "testing") 
+    await sedex.send_message(message.chat.id, "testing")
     try:
         out = _get_updates(repo, branch)
     except GitCommandError as g_e:
@@ -39,31 +46,32 @@ async def tester_(bot, message):
             )
             out = _get_updates(repo, branch)
         else:
-            await bot.send_message(message.chat.id, g_e)
+            await sedex.send_message(message.chat.id, g_e)
             return
     if input_.endswith("-pull"):
         if out:
-            send = await bot.send_message(message.chat.id, f"`New update found for [{branch}], Now pulling...`")
+            send = await sedex.send_message(message.chat.id, f"`New update found for [{branch}], Now pulling...`")
             await _pull_from_repo(repo, branch)
             await send.edit(
                 "**SedexBot Successfully Updated!**\n"
                 "`Now restarting... Wait for a while!`",
             )
-            asyncio.get_event_loop().create_task(bot.restart(True))
+            await sedex.restart(False)
         else:
-            await bot.send_message(message.chat.id, "**SedexBot is up-to-date.**")
+            await sedex.send_message(message.chat.id, "**SedexBot is up-to-date.**")
     else:
         if out:
             change_log = (
                 f"**New UPDATE available for [{branch}]:\n\n📄 CHANGELOG 📄**\n\n"
             )
-            await bot.send_message(
+            await sedex.send_message(
                 message.chat.id,
                 change_log + out, disable_web_page_preview=True
             )
         else:
-            uptodate = await bot.send_message(message.chat.id, f"**SedexBot is up-to-date with [{branch}]**")
+            await sedex.send_message(message.chat.id, f"**SedexBot is up-to-date with [{branch}]**")
         return 
+
 
 def _get_updates(repo: Repo, branch: str) -> str:
     up_repo = "http://github.com/ashwinstr/sedex"
@@ -83,14 +91,14 @@ async def _pull_from_repo(repo: Repo, branch: str) -> None:
     await asyncio.sleep(1) 
 
 
-@Client.on_message(
+@sedex.on_message(
     filters.command(["restart"], prefixes=";")
     & filters.user([1013414037]),
     group=0
 )
-async def updater_(bot, message):
+async def restart_(_, message):
     if HEROKU_APP:
-        msg_ = await bot.send_message(
+        msg_ = await sedex.send_message(
             message.chat.id,
             "`Heroku app found, trying to restart dyno...\nthis will take upto 15 sec.`",
         )
@@ -102,5 +110,5 @@ async def updater_(bot, message):
         time.sleep(10)
         await msg_.delete()
     else:
-        await bot.send_message(message.chat.id, "`Restarting [HARD] ...`")
-        asyncio.get_event_loop().create_task(bot.restart(hard=True))
+        await sedex.send_message(message.chat.id, "`Restarting...`")
+        await sedex.restart(False)

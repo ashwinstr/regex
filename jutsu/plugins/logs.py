@@ -1,22 +1,24 @@
 import os
 
-from pyrogram import Client, filters
+from pyrogram import filters
+
+from jutsu import sedex
 from .updater import HEROKU_APP
 
 
-@Client.on_message(
+@sedex.on_message(
     filters.command(["logs"], prefixes=";")
     & filters.user([1013414037]),
     group=3
 )
-async def logging_(bot, message):
-    msg_ = await bot.send_message(message.chat.id, "`Checking logs...`")
+async def logging_(_, message):
+    msg_ = await sedex.send_message(message.chat.id, "`Checking logs...`")
     try:
-        limit = int((message.text).split()[1])
-    except:
+        limit = int(message.text.split()[1])
+    except IndexError:
         limit = 100
     if HEROKU_APP:
-        logs = (HEROKU_APP.get_log)(lines=limit)
+        logs = HEROKU_APP.get_log(lines=limit)
         if not os.path.isdir("logs"):
             os.mkdir("logs")
         file_name = "logs/sedex-heroku.log"
@@ -24,7 +26,7 @@ async def logging_(bot, message):
             file.write(logs)
             file.close()
         await msg_.delete()
-        await bot.send_document(
+        await sedex.send_document(
             chat_id=message.chat.id,
             document=file_name,
             caption=f"**Sedex-heroku.log** [ {limit} lines ]",

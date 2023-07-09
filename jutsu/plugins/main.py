@@ -1,18 +1,19 @@
 # ported from KensurBot and modified by @Kakashi_HTK(TG)
 
-
 import re
 from sre_constants import error as sre_err
 
-from pyrogram import Client, filters
+from pyrogram import filters
 from pyrogram.errors import MessageDeleteForbidden
+
+from jutsu import sedex
 
 DELIMITERS = ("/", ":", "|", "_")
 
 
 async def separate_sed(sed_string):
     """Separate sed arguments."""
-    
+
     if str(sed_string).endswith(" -n"):
         sed_string = sed_string.replace(" -n", "")
     else:
@@ -39,11 +40,11 @@ async def separate_sed(sed_string):
 
         while counter < len(sed_string):
             if (
-                sed_string[counter] == "\{2}"
-                and counter + 1 < len(sed_string)
-                and sed_string[counter + 1] == delim
+                    sed_string[counter] == "\{2}"
+                    and counter + 1 < len(sed_string)
+                    and sed_string[counter + 1] == delim
             ):
-                sed_string = sed_string[:counter] + sed_string[counter + 1 :]
+                sed_string = sed_string[:counter] + sed_string[counter + 1:]
             elif (counter + 1) < len(sed_string) and (sed_string[counter] + sed_string[counter + 1]) == "\/":
                 sed_string = sed_string.replace(sed_string[counter], "")
                 counter += 1
@@ -63,24 +64,25 @@ async def separate_sed(sed_string):
     return None
 
 
-@Client.on_message(
+@sedex.on_message(
     filters.regex(pattern=r"^a\/.*\/.*"), group=-1
 )
-async def sed(bot, message):
+async def main_sedex(_, message):
     """For sed command, use sed on Telegram."""
     og_text = message.text
     if not str(og_text).endswith(" -n"):
         try:
-            await bot.delete_messages(message.chat.id, [message.message_id])
+            await sedex.delete_messages(message.chat.id, [message.message_id])
         except MessageDeleteForbidden:
-            pass 
+            pass
     reply_ = message.reply_to_message
     is_reply = True
     if not reply_:
         is_reply = False
     else:
         if not reply_.text and not reply_.caption:
-            await bot.send_message(message.chat.id, "Reply to message with text plox...", reply_to_message_id=reply_.message_id)
+            await sedex.send_message(message.chat.id, "Reply to message with text plox...",
+                                     reply_to_message_id=reply_.message_id)
             return
     sed_result = await separate_sed(og_text)
     if sed_result:
@@ -88,11 +90,11 @@ async def sed(bot, message):
     else:
         return
     if not repl:
-            return await bot.send_message(
-                "`Master, I don't have brains. Well you neither I guess.`"
-            ) 
+        return await sedex.send_message(
+            "`Master, I don't have brains. Well you neither I guess.`"
+        )
     if is_reply:
-        textx = await bot.get_messages(message.chat.id, message.reply_to_message.message_id)
+        textx = await sedex.get_messages(message.chat.id, message.reply_to_message.message_id)
         reply_to = message.reply_to_message.message_id
     else:
         found = False
@@ -100,7 +102,7 @@ async def sed(bot, message):
         for one in range(15):
             msg_id = (message.message_id - one) - 1
             try:
-                textx = await bot.get_messages(message.chat.id, msg_id)
+                textx = await sedex.get_messages(message.chat.id, msg_id)
                 if not last:
                     last_msg = textx
                     last = True
@@ -120,13 +122,13 @@ async def sed(bot, message):
         if textx:
             to_fix = textx.text
         else:
-            return await bot.send_message(
+            return await sedex.send_message(
                 "`Master, I don't have brains. Well you neither I guess.`"
             )
         try:
             check = re.match(repl, to_fix, flags=re.IGNORECASE)
             if check and check.group(0).lower() == to_fix.lower():
-                 pass
+                pass
             if "i" in flags and "g" in flags:
                 text = re.sub(fr"{repl}", fr"{repl_with}", to_fix, flags=re.I).strip()
             elif "u" in flags and "g" in flags:
@@ -144,23 +146,20 @@ async def sed(bot, message):
             elif "u" in flags:
                 repl_with = bytes(repl_with, "utf-8").decode('unicode_escape')
                 text = re.sub(fr"{repl}", repl_with, to_fix, count=1).strip()
-#            elif "e" in flags:
-#                text = re.sub(fr"{repl}", repl_with, to_fix, count=1).strip()
             else:
                 text = re.sub(fr"{repl}", fr"{repl_with}", to_fix, count=1).strip()
         except sre_err as e:
-            return await bot.send_message(message.chat.id, f"**ERROR:** {e}")
-#            return await bot.send_message(message.chat.id, "**[Learn Regex](https://regexone.com)**")
+            return await sedex.send_message(message.chat.id, f"**ERROR:** {e}")
         if text:
-            await bot.send_message(message.chat.id, text, reply_to_message_id=reply_to, parse_mode="html")
-           
+            await sedex.send_message(message.chat.id, text, reply_to_message_id=reply_to, parse_mode="html")
 
-@Client.on_message(
+
+@sedex.on_message(
     filters.regex(pattern=r"^r\/.*"), group=-2
 )
-async def no_reply_sed(bot, message):
+async def reply_sed(_, message):
     try:
-        await bot.delete_messages(message.chat.id, message.message_id)
+        await sedex.delete_messages(message.chat.id, message.message_id)
     except MessageDeleteForbidden:
         pass
     reply_ = message.reply_to_message
@@ -170,4 +169,4 @@ async def no_reply_sed(bot, message):
         reply_to = None
     text_ = message.text
     input_ = text_.split("/", 1)[1]
-    await bot.send_message(message.chat.id, input_, reply_to_message_id=reply_to, disable_web_page_preview=True)
+    await sedex.send_message(message.chat.id, input_, reply_to_message_id=reply_to, disable_web_page_preview=True)
