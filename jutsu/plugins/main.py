@@ -4,12 +4,14 @@ import re
 from sre_constants import error as sre_err
 
 from pyrogram import filters
+from pyrogram.types import Message, Chat
 from pyrogram.enums import ParseMode
 from pyrogram.errors import MessageDeleteForbidden
 
-from jutsu import sedex
+from jutsu import sedex, Config
+from jutsu.core.database import CHATS
 
-DELIMITERS = ("/", ":", "|", "_")
+DELIMITERS = ["/", ":", "|", "_"]
 
 
 async def separate_sed(sed_string):
@@ -68,7 +70,7 @@ async def separate_sed(sed_string):
 @sedex.on_message(
     filters.regex(pattern=r"^a\/.*\/.*"), group=-1
 )
-async def main_sedex(_, message):
+async def main_sedex(_, message: Message):
     """For sed command, use sed on Telegram."""
     og_text = message.text
     if not str(og_text).endswith(" -n"):
@@ -152,12 +154,13 @@ async def main_sedex(_, message):
             return await sedex.send_message(message.chat.id, f"**ERROR:** {e}")
         if text:
             await sedex.send_message(message.chat.id, text, reply_to_message_id=reply_to, parse_mode=ParseMode.HTML)
+            await check_chat_list(message.chat)
 
 
 @sedex.on_message(
     filters.regex(pattern=r"^r\/.*"), group=-2
 )
-async def reply_sed(_, message):
+async def reply_sed(_, message: Message):
     try:
         await sedex.delete_messages(message.chat.id, message.id)
     except MessageDeleteForbidden:
@@ -170,3 +173,17 @@ async def reply_sed(_, message):
     text_ = message.text
     input_ = text_.split("/", 1)[1]
     await sedex.send_message(message.chat.id, input_, reply_to_message_id=reply_to, disable_web_page_preview=True)
+    await check_chat_list(message.chat)
+
+
+async def check_chat_list(chat: Chat) -> None:
+    """ add new chat to chat list if not in there """
+    if chat.id not in Config.CHATS:
+        Config.CHATS.append(chat.id)
+        await CHATS.insert_one(
+            {
+                '_id': chat.id,
+                'title': chat.title
+            }
+        )
+        
