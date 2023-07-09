@@ -15,8 +15,8 @@ filter_eval = (
     & filters.user([Config.OWNER_ID])
 )
 
-@sedex.on_message(filter_eval, groups=-3)
-@sedex.on_edited_message(filter_eval, groups=-3)
+@sedex.on_message(filter_eval, group=-3)
+@sedex.on_edited_message(filter_eval, group=-3)
 async def execute_it(_, message: Message):
     """ execute python code """
     input_ = message.text.split(maxsplit=1)[1] if " " in message.text else None
