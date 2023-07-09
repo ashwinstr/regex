@@ -1,6 +1,6 @@
 # init.py
 
-from .core.client import Sedex
-from .config import Config
+from jutsu.core.client import Sedex
+from jutsu.config import Config
 
 sedex = Sedex()

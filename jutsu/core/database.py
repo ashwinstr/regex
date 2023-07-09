@@ -9,7 +9,7 @@ from motor.core import AgnosticClient, AgnosticDatabase, AgnosticCollection
 from jutsu.config import Config
 
 _MGCLIENT: AgnosticClient = AsyncIOMotorClient(Config.DB_URL)
-_RUN = asyncio.get_event_loop().run_until_complete
+# _RUN = asyncio.get_event_loop().run_until_complete
 
 _DATABASE: AgnosticDatabase = _MGCLIENT['jutsu']
 _COL_LIST: List[str] = _DATABASE.list_collection_names()

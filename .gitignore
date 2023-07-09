@@ -8,3 +8,6 @@ poetry.lock
 pyproject.toml
 .replit
 replit.*
+
+# pyc
+*.pyc
