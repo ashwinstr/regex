@@ -14,6 +14,10 @@ async def _init_func():
 	plug_list = os.listdir("jutsu/plugins")
 	for one in plug_list:
 		path_ = one.replace("/", ".")
+		if one.endswith(".py"):
+			one = one.rstrip('.py')
+		else:
+			continue
 		imported_ = importlib.import_module(path_)
 		if not hasattr(imported_, "_init"):
 			continue
@@ -32,13 +36,15 @@ class Sedex(Client):
 
 	def __init__(self):
 		kwargs = {	
-            'name': 'SedexBot',
+            'name': 'MySedex',
             'api_id': Config.API_ID,
             'api_hash': Config.API_HASH,
             'bot_token': Config.BOT_TOKEN,
             'in_memory': True,
             'plugins': dict(root='jutsu/plugins')
         }
+		print(kwargs)
+		
 		super().__init__(**kwargs)
 
 	async def start(self):

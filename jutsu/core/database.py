@@ -1,6 +1,5 @@
 # database.py
 
-import asyncio
 from typing import List
 
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -21,5 +20,3 @@ def get_collection(name: str) -> AgnosticCollection:
 
 def _close_db() -> None:
     _MGCLIENT.close()
-
-CHATS = get_collection("CHATS")

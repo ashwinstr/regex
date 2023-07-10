@@ -3,8 +3,9 @@
 from pyrogram import filters
 from pyrogram.types import Message
 
-from jutsu import sedex, Config
-from jutsu.core.database import CHATS
+from jutsu import sedex, Config, Collection
+
+CHATS = Collection.CHATS
 
 async def _init() -> None:
     """ load chats' list at start """

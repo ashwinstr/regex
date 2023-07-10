@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 
 if os.path.isfile("config.env"):
 	load_dotenv("config.env")
-	print("Config loaded...")
 
 
 class Config:

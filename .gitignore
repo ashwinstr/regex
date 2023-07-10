@@ -11,3 +11,6 @@ replit.*
 
 # pyc
 *.pyc
+
+# pycache
+__pycache__

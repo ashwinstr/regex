@@ -8,10 +8,11 @@ from pyrogram.types import Message, Chat
 from pyrogram.enums import ParseMode
 from pyrogram.errors import MessageDeleteForbidden
 
-from jutsu import sedex, Config
-from jutsu.core.database import CHATS
+from jutsu import sedex, Config, Collection
 
-DELIMITERS = ["/", ":", "|", "_"]
+CHATS = Collection.CHATS
+
+DELIMITERS = ["/", ":", "|"]
 
 
 async def separate_sed(sed_string):
@@ -185,5 +186,4 @@ async def check_chat_list(chat: Chat) -> None:
                 '_id': chat.id,
                 'title': chat.title
             }
-        )
-        
+        )    
