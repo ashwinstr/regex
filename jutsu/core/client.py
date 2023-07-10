@@ -13,12 +13,17 @@ async def _init_func():
 	init_list_ = []
 	plug_list = os.listdir("jutsu/plugins")
 	for one in plug_list:
-		path_ = one.replace("/", ".")
 		if one.endswith(".py"):
 			one = one.rstrip('.py')
 		else:
 			continue
-		imported_ = importlib.import_module(path_)
+		path_ = one.replace("/", ".")
+		path_ = f"jutsu.plugins.{path_}"
+		try:
+			imported_ = importlib.import_module(path_)
+		except ImportError as e
+			print(e)
+			continue
 		if not hasattr(imported_, "_init"):
 			continue
 		init_function = getattr(imported_, "_init")
@@ -43,8 +48,6 @@ class Sedex(Client):
             'in_memory': True,
             'plugins': dict(root='jutsu/plugins')
         }
-		print(kwargs)
-		
 		super().__init__(**kwargs)
 
 	async def start(self):
