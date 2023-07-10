@@ -21,7 +21,7 @@ async def _init_func():
 		path_ = f"jutsu.plugins.{path_}"
 		try:
 			imported_ = importlib.import_module(path_)
-		except ImportError as e
+		except ImportError as e:
 			print(e)
 			continue
 		if not hasattr(imported_, "_init"):
