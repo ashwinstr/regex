@@ -35,4 +35,17 @@ async def execute_it(_, message: Message):
     sys.stderr = sys.__stderr__
     output = code_out.getvalue().strip() or code_err.getvalue.strip() or func_out or ""
     await reply_.edit(f"**>** `{input_}`\n\n**>>** `{output}`", parse_mode=ParseMode.MARKDOWN)
-    
+   
+
+term_filters = (
+    filters.command("term", prefixes=";")
+    & filters.user(Config.OWNER_ID)
+)
+
+
+@sedex.on_message(term_filters, group=-4)
+@sedex.on_edited_message(term_filters, group=-4)
+async def terminator(_, message: Message):
+    """ terminal """
+
+
